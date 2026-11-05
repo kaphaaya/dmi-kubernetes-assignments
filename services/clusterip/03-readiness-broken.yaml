@@ -1,0 +1,9 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: nginx
+          readinessProbe:
+            httpGet:
+              path: /does-not-exist
+              port: 80
