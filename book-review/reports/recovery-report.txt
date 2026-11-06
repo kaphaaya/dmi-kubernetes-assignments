@@ -1,0 +1,57 @@
+================================================
+KUBERNETES INCIDENT TRIAGE REPORT
+================================================
+Full Name:       Aziz Olaide Kafayat
+Cluster:         dmi-incident-triage
+Context:         arn:aws:eks:us-east-1:984381715391:cluster/dmi-incident-triage
+Namespace:       book-review
+Deployment:      backend
+Container:       backend
+Original Image:  kaphaaya/book-review-backend:v1
+Service:         backend
+Pod Selector:    app=backend
+Timestamp:       Fri Nov  6 16:29:13 WAT 2026
+================================================
+
+CHECKS:
+ - Deployment status
+ - Pod readiness
+ - Container restarts
+ - Recent warning events
+ - Service ready backends
+
+CHECK 1 — DEPLOYMENT STATUS
+Desired: 1 | Ready: 1 | Available: 1
+[OK]   Deployment has all desired replicas available.
+
+CHECK 2 — POD READINESS
+backend-858596cdc7-mj6cq | Phase: Running | Ready: true
+[OK]   All matching Pods are Running and Ready.
+
+CHECK 3 — CONTAINER RESTARTS
+backend-858596cdc7-mj6cq | Restarts: 6
+[WARN] Detected 6 container restart(s).
+
+CHECK 4 — RECENT WARNING EVENTS
+LAST SEEN   TYPE      REASON             OBJECT                         MESSAGE
+60m         Warning   FailedScheduling   pod/mysql-0                    skip schedule deleting pod: book-review/mysql-0
+59m         Warning   BackOff            pod/backend-858596cdc7-mj6cq   Back-off restarting failed container backend in pod backend-858596cdc7-mj6cq_book-review(131a2865-1791-47ba-9926-44eda99ac0c4)
+7m45s       Warning   Failed             pod/backend-7489c59d7f-z4qwh   Failed to pull image "kaphaaya/book-review-backend:does-not-exist": rpc error: code = NotFound desc = failed to pull and unpack image "docker.io/kaphaaya/book-review-backend:does-not-exist": failed to resolve reference "docker.io/kaphaaya/book-review-backend:does-not-exist": docker.io/kaphaaya/book-review-backend:does-not-exist: not found
+7m45s       Warning   Failed             pod/backend-7489c59d7f-z4qwh   Error: ErrImagePull
+7m30s       Warning   Failed             pod/backend-7489c59d7f-z4qwh   Error: ImagePullBackOff
+[WARN] 5 warning event(s) found. Review their timestamps and messages.
+
+CHECK 5 — SERVICE READY BACKENDS
+Ready backend IPs: 192.168.78.9
+[OK]   Service backend has ready backends.
+
+================================================
+FINAL SUMMARY
+================================================
+Full Name:       Aziz Olaide Kafayat
+Checks Passed:   3
+Warnings:        2
+Failures:        0
+Overall Status:  WARN
+Exit Code:       1
+================================================

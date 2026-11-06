@@ -1,0 +1,162 @@
+
+[1mBook Review — Kubernetes Incident Triage[0m
+Timestamp : 2026-11-06T14:39:25Z
+Cluster   : dmi-incident-triage
+Namespace : book-review
+Region    : us-east-1
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  1. Cluster Connectivity[0m
+[0;36m[1m══════════════════════════════════════════[0m
+  [1m[INFO][0m  kubectl context: arn:aws:eks:us-east-1:984381715391:cluster/dmi-incident-triage
+  [0;32m[OK][0m    kubectl can reach the API server
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  2. Worker Nodes[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME                             STATUS   ROLES    AGE   VERSION                INTERNAL-IP      EXTERNAL-IP     OS-IMAGE                        KERNEL-VERSION                    CONTAINER-RUNTIME
+ip-192-168-67-199.ec2.internal   Ready    <none>   30m   v1.31.14-eks-6e7947a   192.168.67.199   44.200.171.66   Amazon Linux 2023.12.20261102   6.1.189-236.400.amzn2023.x86_64   containerd://2.3.7+unknown
+ip-192-168-73-243.ec2.internal   Ready    <none>   14m   v1.31.14-eks-6e7947a   192.168.73.243   18.232.75.109   Amazon Linux 2023.12.20261102   6.1.189-236.400.amzn2023.x86_64   containerd://2.3.7+unknown
+
+  [0;32m[OK][0m    All 2 node(s) Ready
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  3. Namespace: book-review[0m
+[0;36m[1m══════════════════════════════════════════[0m
+  [0;32m[OK][0m    Namespace 'book-review' exists
+  [1m[INFO][0m  Phase: Active
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  4. Pod Status[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME                        READY   STATUS    RESTARTS      AGE   IP               NODE                             NOMINATED NODE   READINESS GATES
+backend-858596cdc7-mj6cq    1/1     Running   6 (11m ago)   16m   192.168.78.9     ip-192-168-73-243.ec2.internal   <none>           <none>
+frontend-79967c689b-76zvj   2/2     Running   0             18m   192.168.64.221   ip-192-168-67-199.ec2.internal   <none>           <none>
+mysql-0                     1/1     Running   0             11m   192.168.64.176   ip-192-168-67-199.ec2.internal   <none>           <none>
+
+  [0;32m[OK][0m    mysql: 1/1 pod(s) Running and Ready
+  [0;32m[OK][0m    backend: 1/1 pod(s) Running and Ready
+  [0;32m[OK][0m    frontend: 1/1 pod(s) Running and Ready
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  5. Deployments[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS       IMAGES                                          SELECTOR
+backend    1/1     1            1           18m   backend          kaphaaya/book-review-backend:v1                 app=backend
+frontend   1/1     1            1           18m   frontend,nginx   kaphaaya/book-review-frontend:v1,nginx:alpine   app=frontend
+
+  [1m[INFO][0m  backend image: kaphaaya/book-review-backend:v1
+  [0;32m[OK][0m    backend: 1/1 replicas available
+  [1m[INFO][0m  frontend image: kaphaaya/book-review-frontend:v1
+  [0;32m[OK][0m    frontend: 1/1 replicas available
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  6. StatefulSet: mysql[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME    READY   AGE   CONTAINERS   IMAGES
+mysql   1/1     19m   mysql        mysql:8.0
+
+  [1m[INFO][0m  mysql image: mysql:8.0
+  [0;32m[OK][0m    mysql: 1/1 ready
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  7. Services[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME       TYPE           CLUSTER-IP      EXTERNAL-IP                                                             PORT(S)        AGE   SELECTOR
+backend    ClusterIP      10.100.174.3    <none>                                                                  3001/TCP       19m   app=backend
+frontend   LoadBalancer   10.100.246.88   a843aa2ecfe2e4511a01e28621e8ca49-11909089.us-east-1.elb.amazonaws.com   80:32071/TCP   19m   app=frontend
+mysql      ClusterIP      None            <none>                                                                  3306/TCP       19m   app=mysql
+
+  [1m[INFO][0m  mysql (type=ClusterIP)
+  [0;32m[OK][0m    mysql: endpoints present (1 address set(s))
+  [1m[INFO][0m  backend (type=ClusterIP)
+  [0;32m[OK][0m    backend: endpoints present (1 address set(s))
+  [1m[INFO][0m  frontend (type=LoadBalancer)
+  [0;32m[OK][0m    frontend: endpoints present (1 address set(s))
+
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  8. Service Endpoints Detail[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME       ENDPOINTS             AGE
+backend    192.168.78.9:3001     19m
+frontend   192.168.64.221:80     19m
+mysql      192.168.64.176:3306   19m
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  9. PersistentVolumeClaims[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+mysql-data-mysql-0   Bound    pvc-c7d4fcd6-784f-48df-8d08-ab467afb1720   5Gi        RWO            gp3            <unset>                 19m
+
+  [1m[INFO][0m  PVCs Bound=1  Pending=0
+  [0;32m[OK][0m    All PVCs bound
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  10. ConfigMaps & Secrets (names only)[0m
+[0;36m[1m══════════════════════════════════════════[0m
+  [1m[INFO][0m  ConfigMaps:
+    backend-config
+    kube-root-ca.crt
+    nginx-config
+
+  [1m[INFO][0m  Secrets (names only — values not shown):
+    book-review-secret (type=Opaque)
+  [0;32m[OK][0m    book-review-secret exists
+  [1m[INFO][0m  Secret keys: ['DB_PASS', 'DB_USER', 'JWT_SECRET', 'MYSQL_ROOT_PASSWORD']
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  11. Recent Warning Events[0m
+[0;36m[1m══════════════════════════════════════════[0m
+LAST SEEN   TYPE      REASON                   OBJECT                          MESSAGE
+19m         Warning   FailedScheduling         pod/frontend-79967c689b-76zvj   0/1 nodes are available: 1 Insufficient memory, 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+18m         Warning   Failed                   pod/backend-7f59f9f688-fl2km    Error: secret "book-review-secret" not found
+18m         Warning   FailedScheduling         pod/backend-858596cdc7-mj6cq    0/1 nodes are available: 1 Insufficient memory, 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+18m         Warning   BackOff                  pod/mysql-0                     Back-off restarting failed container mysql in pod mysql-0_book-review(d109b1ae-94b9-4d2e-a298-5bc6d2e8e101)
+17m         Warning   FailedScheduling         pod/backend-858596cdc7-mj6cq    0/1 nodes are available: 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+17m         Warning   FailedCreatePodSandBox   pod/frontend-79967c689b-76zvj   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "4f9a2e43ac49760f7ce29590ed495460e85595093d4c41ae06170ca240650c2f": plugin type="aws-cni" name="aws-cni" failed (add): add cmd: failed to assign an IP address to container
+17m         Warning   FailedScheduling         pod/mysql-0                     0/1 nodes are available: 1 Insufficient memory, 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+17m         Warning   FailedCreatePodSandBox   pod/frontend-79967c689b-76zvj   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "cbf0f26ef29cd1bb734943f01ea06c9b2ce59b984dc73fee255812107a1fdfbc": plugin type="aws-cni" name="aws-cni" failed (add): add cmd: failed to assign an IP address to container
+16m         Warning   BackOff                  pod/backend-7f59f9f688-fl2km    Back-off restarting failed container backend in pod backend-7f59f9f688-fl2km_book-review(3212fb15-6c7b-451c-8062-0e9a318334e1)
+16m         Warning   FailedCreatePodSandBox   pod/frontend-79967c689b-76zvj   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "d678900172e9daae4bce6d5da6c032e895ed72e9a537db7145106128356f9e96": plugin type="aws-cni" name="aws-cni" failed (add): add cmd: failed to assign an IP address to container
+15m         Warning   FailedScheduling         pod/mysql-0                     0/2 nodes are available: 1 Insufficient memory, 1 Too many pods, 1 node(s) had volume node affinity conflict. preemption: 0/2 nodes are available: 1 No preemption victims found for incoming pod, 1 Preemption is not helpful for scheduling.
+15m         Warning   FailedScheduling         pod/mysql-0                     0/2 nodes are available: 1 Insufficient memory, 1 node(s) had volume node affinity conflict. preemption: 0/2 nodes are available: 1 No preemption victims found for incoming pod, 1 Preemption is not helpful for scheduling.
+12m         Warning   FailedScheduling         pod/mysql-0                     skip schedule deleting pod: book-review/mysql-0
+11m         Warning   BackOff                  pod/backend-858596cdc7-mj6cq    Back-off restarting failed container backend in pod backend-858596cdc7-mj6cq_book-review(131a2865-1791-47ba-9926-44eda99ac0c4)
+  [1;33m[WARN][0m  14 warning event(s) found
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  12. Recent Pod Logs (errors/warnings)[0m
+[0;36m[1m══════════════════════════════════════════[0m
+  [1m[INFO][0m  --- mysql-0 (last 20 lines) ---
+2026-11-06T14:28:52.735416Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+2026-11-06T14:28:53.878185Z 0 [System] [MY-010229] [Server] Starting XA crash recovery...
+2026-11-06T14:28:53.894805Z 0 [System] [MY-010232] [Server] XA crash recovery finished.
+2026-11-06T14:28:53.980294Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-11-06T14:28:53.985963Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+  [1m[INFO][0m  --- backend-858596cdc7-mj6cq (last 20 lines) ---
+    (no error keywords found in last 20 lines)
+  [1m[INFO][0m  --- frontend-79967c689b-76zvj (last 20 lines) ---
+    (no error keywords found in last 20 lines)
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  13. StorageClass[0m
+[0;36m[1m══════════════════════════════════════════[0m
+NAME   PROVISIONER       RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+gp3    ebs.csi.aws.com   Delete          WaitForFirstConsumer   true                   20m
+  [0;32m[OK][0m    gp3 StorageClass exists
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  14. Frontend External Access[0m
+[0;36m[1m══════════════════════════════════════════[0m
+  [0;32m[OK][0m    Frontend LoadBalancer: http://a843aa2ecfe2e4511a01e28621e8ca49-11909089.us-east-1.elb.amazonaws.com
+  [1m[INFO][0m  Testing HTTP response (timeout 5s)...
+  [0;32m[OK][0m    HTTP 200 — application responding
+
+[0;36m[1m══════════════════════════════════════════[0m
+[0;36m[1m  Triage Summary[0m
+[0;36m[1m══════════════════════════════════════════[0m
+  [1;33m[1mResult: WARNING — degraded, review warnings above[0m
+
+Timestamp: 2026-11-06T14:41:40Z
+Exit code: 1

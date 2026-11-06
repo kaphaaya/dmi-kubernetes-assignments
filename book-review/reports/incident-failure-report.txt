@@ -1,0 +1,70 @@
+================================================
+KUBERNETES INCIDENT TRIAGE REPORT
+================================================
+Full Name:       Aziz Olaide Kafayat
+Cluster:         dmi-incident-triage
+Context:         arn:aws:eks:us-east-1:984381715391:cluster/dmi-incident-triage
+Namespace:       book-review
+Deployment:      backend
+Container:       backend
+Original Image:  kaphaaya/book-review-backend:v1
+Service:         backend
+Pod Selector:    app=backend
+Timestamp:       Fri Nov  6 16:23:09 WAT 2026
+================================================
+
+CHECKS:
+ - Deployment status
+ - Pod readiness
+ - Container restarts
+ - Recent warning events
+ - Service ready backends
+
+CHECK 1 — DEPLOYMENT STATUS
+Desired: 1 | Ready: 1 | Available: 1
+[OK]   Deployment has all desired replicas available.
+
+CHECK 2 — POD READINESS
+backend-7489c59d7f-z4qwh | Phase: Pending | Ready: false
+backend-858596cdc7-mj6cq | Phase: Running | Ready: true
+[FAIL] 1 of 2 matching Pods are Ready.
+
+CHECK 3 — CONTAINER RESTARTS
+backend-7489c59d7f-z4qwh | Restarts: 0
+backend-858596cdc7-mj6cq | Restarts: 6
+[WARN] Detected 6 container restart(s).
+
+CHECK 4 — RECENT WARNING EVENTS
+LAST SEEN   TYPE      REASON                   OBJECT                          MESSAGE
+60m         Warning   Failed                   pod/backend-7f59f9f688-fl2km    Error: secret "book-review-secret" not found
+60m         Warning   FailedScheduling         pod/backend-858596cdc7-mj6cq    0/1 nodes are available: 1 Insufficient memory, 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+60m         Warning   BackOff                  pod/mysql-0                     Back-off restarting failed container mysql in pod mysql-0_book-review(d109b1ae-94b9-4d2e-a298-5bc6d2e8e101)
+59m         Warning   FailedScheduling         pod/backend-858596cdc7-mj6cq    0/1 nodes are available: 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+59m         Warning   FailedCreatePodSandBox   pod/frontend-79967c689b-76zvj   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "4f9a2e43ac49760f7ce29590ed495460e85595093d4c41ae06170ca240650c2f": plugin type="aws-cni" name="aws-cni" failed (add): add cmd: failed to assign an IP address to container
+59m         Warning   FailedScheduling         pod/mysql-0                     0/1 nodes are available: 1 Insufficient memory, 1 Too many pods. preemption: 0/1 nodes are available: 1 No preemption victims found for incoming pod.
+59m         Warning   FailedCreatePodSandBox   pod/frontend-79967c689b-76zvj   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "cbf0f26ef29cd1bb734943f01ea06c9b2ce59b984dc73fee255812107a1fdfbc": plugin type="aws-cni" name="aws-cni" failed (add): add cmd: failed to assign an IP address to container
+58m         Warning   BackOff                  pod/backend-7f59f9f688-fl2km    Back-off restarting failed container backend in pod backend-7f59f9f688-fl2km_book-review(3212fb15-6c7b-451c-8062-0e9a318334e1)
+58m         Warning   FailedCreatePodSandBox   pod/frontend-79967c689b-76zvj   Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "d678900172e9daae4bce6d5da6c032e895ed72e9a537db7145106128356f9e96": plugin type="aws-cni" name="aws-cni" failed (add): add cmd: failed to assign an IP address to container
+57m         Warning   FailedScheduling         pod/mysql-0                     0/2 nodes are available: 1 Insufficient memory, 1 Too many pods, 1 node(s) had volume node affinity conflict. preemption: 0/2 nodes are available: 1 No preemption victims found for incoming pod, 1 Preemption is not helpful for scheduling.
+57m         Warning   FailedScheduling         pod/mysql-0                     0/2 nodes are available: 1 Insufficient memory, 1 node(s) had volume node affinity conflict. preemption: 0/2 nodes are available: 1 No preemption victims found for incoming pod, 1 Preemption is not helpful for scheduling.
+54m         Warning   FailedScheduling         pod/mysql-0                     skip schedule deleting pod: book-review/mysql-0
+53m         Warning   BackOff                  pod/backend-858596cdc7-mj6cq    Back-off restarting failed container backend in pod backend-858596cdc7-mj6cq_book-review(131a2865-1791-47ba-9926-44eda99ac0c4)
+100s        Warning   Failed                   pod/backend-7489c59d7f-z4qwh    Failed to pull image "kaphaaya/book-review-backend:does-not-exist": rpc error: code = NotFound desc = failed to pull and unpack image "docker.io/kaphaaya/book-review-backend:does-not-exist": failed to resolve reference "docker.io/kaphaaya/book-review-backend:does-not-exist": docker.io/kaphaaya/book-review-backend:does-not-exist: not found
+100s        Warning   Failed                   pod/backend-7489c59d7f-z4qwh    Error: ErrImagePull
+85s         Warning   Failed                   pod/backend-7489c59d7f-z4qwh    Error: ImagePullBackOff
+[WARN] 16 warning event(s) found. Review their timestamps and messages.
+
+CHECK 5 — SERVICE READY BACKENDS
+Ready backend IPs: 192.168.78.9
+[OK]   Service backend has ready backends.
+
+================================================
+FINAL SUMMARY
+================================================
+Full Name:       Aziz Olaide Kafayat
+Checks Passed:   2
+Warnings:        2
+Failures:        1
+Overall Status:  FAIL
+Exit Code:       2
+================================================
