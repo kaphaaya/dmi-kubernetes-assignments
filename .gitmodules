@@ -1,0 +1,3 @@
+[submodule "book-review/book-review-app"]
+	path = book-review/book-review-app
+	url = https://github.com/pravinmishraaws/book-review-app.git
